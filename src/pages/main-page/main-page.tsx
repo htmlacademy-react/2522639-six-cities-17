@@ -1,109 +1,102 @@
+import cn from 'classnames';
+import Header from '../../components/blocks/header/header';
+import HeaderNav from '../../components/blocks/header/header-nav';
 
-// Main Page
-import { useEffect, useState } from 'react';
-import { fetchOffers } from '../../lib/api';
-import OfferCard from '../../components/cards/offer-card';
-import { Offer } from '../../types/offer';
-import Header from '../../components/blocks/header';
+import CardsList from '../../components//blocks/cards-list/cards-list';
+import Map from '../../components/blocks/map/map';
+import Sort from './components/sort';
+import { CITIES, DEFAULT_SORTING_TYPE, TypesPage } from '../../constants';
+import {
+  CityType,
+  FavoritesListType,
+  ShortOfferListType,
+  TypesPageEnum,
+} from '../../types/alltypes';
+import { useState } from 'react';
+import { LocationsList } from './components/locations-list';
+import { LocationsItem } from './components/locations-item';
+import { MainEmpty } from './components/main-empty';
+import { MainContent } from './components/main-content';
 
 type MainPageProps = {
-  maxCards: number;
+  currentCity: CityType;
+  onCurrentCityChange: (city: CityType) => void;
+  isLoggedIn: boolean;
+  shortOffers: ShortOfferListType;
+  favorites: FavoritesListType;
 };
 
-function MainPage({ maxCards }: MainPageProps): JSX.Element {
-  const [displayedOffers, setDisplayedOffers] = useState<Offer[]>([]);
+function MainPage({
+  currentCity,
+  onCurrentCityChange,
+  shortOffers,
+  isLoggedIn,
+  favorites,
+}: MainPageProps): JSX.Element {
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const handleCardChange = (id: string | null) => setActiveCardId(id);
 
-  useEffect(() => {
-    async function loadOffers() {
-      const data = await fetchOffers();
-      // Выводим случайные предложения и ограничиваем их количество по заданному в index.tsx
-      const randomOffers = data.sort(() => 0.5 - Math.random()).slice(0, maxCards);
-      setDisplayedOffers(randomOffers);
-    }
-
-    loadOffers();
-  }, [maxCards]);
+  const isEmpty = shortOffers.length === 0;
+  const typesPage: TypesPageEnum = TypesPage.Main;
+  const mainClasses = cn('page__main page__main--index', {
+    ['page__main--index-empty']: isEmpty,
+  });
+  const containerClasses = cn('cities__places-container container', {
+    ['cities__places-container--empty']: isEmpty,
+  });
+  const sectionClasses = cn({
+    ['cities__places places']: !isEmpty,
+    ['cities__no-places']: isEmpty,
+  });
 
   return (
     <div className="page page--gray page--main">
-      <Header />
-
-      <main className="page__main page__main--index">
+      <span className="visually-hidden">{activeCardId}</span>
+      <Header typesPage={typesPage}>
+        <HeaderNav
+          isLoggedIn={isLoggedIn}
+          userName={'Oliver.conner@gmail.com'}
+          favoriteCount={favorites.length}
+        />
+      </Header>
+      <main className={mainClasses}>
         <h1 className="visually-hidden">Cities</h1>
         <div className="tabs">
           <section className="locations container">
-            <ul className="locations__list tabs__list">
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Paris</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Cologne</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Brussels</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item tabs__item--active">
-                  <span>Amsterdam</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Hamburg</span>
-                </a>
-              </li>
-              <li className="locations__item">
-                <a className="locations__item-link tabs__item" href="#">
-                  <span>Dusseldorf</span>
-                </a>
-              </li>
-            </ul>
+            <LocationsList>
+              {CITIES.map((city) => (
+                <LocationsItem
+                  key={city}
+                  city={city}
+                  currentCity={currentCity}
+                  onCurrentCityChange={onCurrentCityChange}
+                  typesPage={typesPage}
+                />
+              ))}
+            </LocationsList>
           </section>
         </div>
         <div className="cities">
-          <div className="cities__places-container container">
-            <section className="cities__places places">
-              <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">
-                {displayedOffers.length} places to stay in Amsterdam
-              </b>
-              <form className="places__sorting" action="#" method="get">
-                <span className="places__sorting-caption">Sort by</span>
-                <span className="places__sorting-type" tabIndex={0}>
-                  Popular
-                  <svg className="places__sorting-arrow" width="7" height="4">
-                    <use href="#icon-arrow-select" />
-                  </svg>
-                </span>
-                <ul className="places__options places__options--custom places__options--opened">
-                  <li className="places__option places__option--active" tabIndex={0}>Popular</li>
-                  <li className="places__option" tabIndex={0}>Price: low to high</li>
-                  <li className="places__option" tabIndex={0}>Price: high to low</li>
-                  <li className="places__option" tabIndex={0}>Top rated first</li>
-                </ul>
-              </form>
-              <div className="cities__places-list places__list tabs__content">
-                {displayedOffers.map((offer) => (
-                  <OfferCard
-                    key={offer.id}
-                    title={offer.title}
-                    type={offer.type}
-                    price={offer.price}
-                    isPremium={offer.isPremium}
-                    rating={offer.rating}
-                    previewImage={offer.previewImage}
+          <div className={containerClasses}>
+            <section className={sectionClasses}>
+              {isEmpty ? (
+                <MainEmpty city={'Dusseldorf'} />
+              ) : (
+                <MainContent
+                  currentCity={currentCity}
+                  offersCount={shortOffers.length}
+                >
+                  <Sort currentSortType={DEFAULT_SORTING_TYPE} />,
+                  <CardsList
+                    offers={shortOffers}
+                    onCardChange={handleCardChange}
+                    typesPage={typesPage}
                   />
-                ))}
-              </div>
+                </MainContent>
+              )}
             </section>
             <div className="cities__right-section">
-              <section className="cities__map map" />
+              {isEmpty || <Map className={'cities__map'} />}
             </div>
           </div>
         </div>
@@ -111,4 +104,5 @@ function MainPage({ maxCards }: MainPageProps): JSX.Element {
     </div>
   );
 }
+
 export default MainPage;

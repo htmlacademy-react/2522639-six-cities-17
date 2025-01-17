@@ -1,57 +1,38 @@
-// login
-import { Link } from 'react-router-dom';
-import Logo from '../../components/blocks/logo';
+import Header from '../../components/blocks/header/header';
+import LocationsItemLink from '../../components/blocks/locations-item-link/locations-item-link';
+import SignIn from '../../components/sing-in/sign-in';
+import { Title } from '../../components/blocks/title';
+import { TypesPage } from '../../constants';
+import {
+  CityType,
+  CurrentCityChangeType,
+  TypesPageEnum,
+} from '../../types/alltypes';
 
-function LoginPage(): JSX.Element {
+type LoginPageProps = {
+  currentCity: CityType;
+  onCurrentCityChange: CurrentCityChangeType;
+};
+
+function LoginPage(props: LoginPageProps): JSX.Element {
+  const { currentCity, onCurrentCityChange } = props;
+  const typesPage: TypesPageEnum = TypesPage.Login;
   return (
     <div className="page page--gray page--login">
-      <header className="header">
-        <div className="container">
-          <div className="header__wrapper">
-            <div className="header__left">
-              <Logo/>
-            </div>
-          </div>
-        </div>
-      </header>
-
+      <Title typesPage={typesPage} />
+      <Header typesPage={typesPage} />
       <main className="page__main page__main--login">
         <div className="page__login-container container">
           <section className="login">
             <h1 className="login__title">Sign in</h1>
-            <form className="login__form form" action="#" method="post">
-              <div className="login__input-wrapper form__input-wrapper">
-                <label className="visually-hidden" htmlFor="email">E-mail</label>
-                <input
-                  className="login__input form__input"
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="Email"
-                  required
-                />
-              </div>
-              <div className="login__input-wrapper form__input-wrapper">
-                <label className="visually-hidden" htmlFor="password">Password</label>
-                <input
-                  className="login__input form__input"
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="Password"
-                  required
-                />
-              </div>
-              <button className="login__submit form__submit button" type="submit">
-                Sign in
-              </button>
-            </form>
+            <SignIn />
           </section>
           <section className="locations locations--login locations--current">
-            <div className="locations__item">
-              <Link className="locations__item-link" to="/">
-                <span>Amsterdam</span>
-              </Link>
+            <div
+              onClick={() => onCurrentCityChange(currentCity)}
+              className="locations__item"
+            >
+              <LocationsItemLink city={currentCity} typesPage={typesPage} />
             </div>
           </section>
         </div>

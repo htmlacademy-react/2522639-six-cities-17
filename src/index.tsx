@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './components/app/app';
-
-// Задаем количество предложений и их отображение
-const MAX_CARDS = 8;
+import { shortOffers } from './mocks/short-offers';
+import { offers } from './mocks/offers';
+import { favorites } from './mocks/favorites';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -11,6 +11,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <App maxCards={MAX_CARDS} />
+    <App shortOffers={shortOffers} offers={offers} favorites={favorites} />
   </React.StrictMode>
 );
