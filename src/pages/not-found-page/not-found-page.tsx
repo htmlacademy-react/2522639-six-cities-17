@@ -1,6 +1,6 @@
 //404 page
 import { Link } from 'react-router-dom';
-import Logo from '../../components/blocks/logo';
+
 
 function NotFoundPage(): JSX.Element {
   return (
@@ -17,7 +17,6 @@ function NotFoundPage(): JSX.Element {
         padding: '20px',
       }}
     >
-      <Logo/>
       <h1 style={{ fontSize: '6rem', marginBottom: '1rem', fontWeight: 'bold' }}>404</h1>
       <p style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>Page not found</p>
       <Link
